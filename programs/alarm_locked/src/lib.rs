@@ -63,7 +63,6 @@ pub mod alarm_locked {
     let vault_state = &ctx.accounts.vault_state;
     let clock = Clock::get()?;
 
-    // Verify ownership
     require!(
         vault_state.owner == ctx.accounts.owner.key(),
         TimeLockError::Unauthorized
@@ -95,7 +94,7 @@ pub mod alarm_locked {
         CpiContext::new_with_signer(
             ctx.accounts.system_program.to_account_info(),
             transfer_instruction,
-            signer, // 👈 This proves the program owns the vault
+            signer, 
         ),
         vault_balance,
     )?;
@@ -207,7 +206,7 @@ pub struct Withdraw<'info> {
     #[account(
         mut,
         seeds = [b"vault", vault_state.key().as_ref()],
-        bump = vault_state.vault_bump, // 👈 Use stored bump
+        bump = vault_state.vault_bump, 
     )]
     pub vault: SystemAccount<'info>,
 
