@@ -14,6 +14,16 @@
 </p>
 
 ---
+A production-style Solana smart contract built with Anchor that enforces
+time-based withdrawal constraints using Program Derived Addresses (PDAs).
+
+This project demonstrates:
+
+- On-chain custody vault architecture
+- PDA-based authorization
+- Time-locked withdrawal logic
+- Devnet deployment
+- Full React + Next.js Web3 frontend
 
 # ✨ Overview
 
