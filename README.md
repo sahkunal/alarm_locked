@@ -1,201 +1,241 @@
-# ⏰ Alarm Locked – Time-Locked Vault (Anchor Capstone)
+# ⏰ Alarm Locked — Time-Locked Vault on Solana
 
-## 📌 Overview
+### 🔐 Deterministic On-Chain Security | Anchor • PDA Architecture • Next.js dApp
 
-**Alarm Locked** is a Solana smart contract built using the **Anchor framework** that implements a **Time-Locked Vault**.
+<p align="center">
+  <strong>A programmable vault where time — not trust — controls access.</strong>
+</p>
 
-The vault allows a user to deposit SOL into a Program Derived Address (PDA) and prevents withdrawals until a predefined `unlock_time` is reached. This demonstrates secure custody, PDA authorization, and time-based constraints on Solana.
-
----
-
-## 🎯 Objective
-
-This project was created as a capstone task to design and implement a vault with a **unique constraint** using Anchor.
-
-The chosen design is a **Time-Locked Vault**, where:
-
-* Funds can be deposited before the unlock time.
-* Withdrawals are strictly blocked until the unlock timestamp.
-* Only the vault owner can withdraw funds.
+<p align="center">
+  <img src="https://img.shields.io/badge/Solana-Devnet-purple?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Anchor-Rust-blue?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Next.js-Frontend-black?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Status-Capstone%20Complete-success?style=for-the-badge" />
+</p>
 
 ---
 
-## 🔐 Unique Constraint – Time Lock Logic
+# ✨ Overview
 
-The core security rule of this vault is a **time-based restriction**:
+**Alarm Locked** is a time-locked vault built using the Anchor framework on Solana.
+Users deposit SOL into a PDA-controlled vault that **cannot be withdrawn until a predefined unlock timestamp**.
 
-* During initialization, an `unlock_time` is set.
-* The program reads the Solana **Clock sysvar** to compare current time with the unlock time.
-* Withdrawals fail if:
+Instead of relying on off-chain timers or user promises, the contract enforces rules directly using Solana’s `Clock` sysvar.
 
-```
-current_time < unlock_time
-```
-
-This ensures funds remain locked until the defined moment.
+> 💡 The blockchain becomes the alarm clock.
 
 ---
 
-## 🧱 Architecture
+# 🧠 Unique Constraint — Time Lock Enforcement
 
-### Program Derived Addresses (PDAs)
+This project implements a **time-based restriction**, one of the core vault constraint patterns.
 
-The vault uses two PDAs:
+### Core Rule
 
-1. **Vault State PDA**
+```
+Withdrawal allowed ONLY when:
+current_time >= unlock_time
+```
 
-   * Seeds: `["state", owner_pubkey]`
-   * Stores:
+### Why This Matters
 
-     * owner
-     * unlock_time
-     * bump seeds
-     * initialization flag
+Traditional apps trust backend logic.
+This vault removes trust entirely:
 
-2. **Vault PDA**
+* No backend timers
+* No admin overrides
+* No manual approvals
 
-   * Seeds: `["vault", vault_state_pubkey]`
-   * Holds deposited SOL
-
-Using PDAs ensures that only the program can authorize transfers from the vault.
+Only deterministic on-chain time.
 
 ---
 
-## ⚙️ Instructions
+# 🔧 How It Works
 
-### 1. Initialize
+## 🏗️ PDA Architecture
 
-Creates the vault state and sets the unlock timestamp.
+| Account       | Seeds                     | Role                          |
+| ------------- | ------------------------- | ----------------------------- |
+| `vault_state` | `[b"state", owner]`       | Stores metadata & unlock time |
+| `vault`       | `[b"vault", vault_state]` | Holds locked SOL              |
 
-```
-initialize(unlock_time)
-```
-
-Rules:
-
-* Unlock time must be in the future.
+The vault PDA signs transactions using program seeds — meaning **users cannot bypass rules**.
 
 ---
 
-### 2. Deposit
+## ⚙️ Instruction Flow
 
-Transfers SOL from the owner into the vault PDA.
+### 1️⃣ Initialize Vault
 
-```
-deposit(amount)
-```
+Creates state PDA and defines unlock timestamp.
 
-Rules:
+### 2️⃣ Deposit
 
-* Only owner can deposit.
-* Deposits allowed only before unlock time.
+Transfers SOL into vault PDA before unlock.
 
----
+### 3️⃣ Withdraw
 
-### 3. Withdraw
+Allowed only after unlock time passes.
 
-Transfers all SOL from the vault PDA back to the owner.
+### 4️⃣ Close Vault
 
-```
-withdraw()
-```
-
-Rules:
-
-* Only owner can withdraw.
-* Allowed only after unlock time.
+Closes PDA after funds are withdrawn.
 
 ---
 
-### 4. Close Vault
-
-Closes the vault state account once funds are withdrawn.
+# 🔐 Constraint Visualization
 
 ```
-close_vault()
+User Deposit
+     │
+     ▼
+┌───────────────┐
+│   Vault PDA   │
+└───────────────┘
+        │
+        │  Clock Sysvar Check
+        ▼
+ IF current_time < unlock_time
+        ❌ REJECT
+ ELSE
+        ✅ ALLOW WITHDRAW
 ```
-
-Rules:
-
-* Vault must be empty.
-* Only owner can close.
 
 ---
 
-## 🧪 Tests
+# 🌐 Frontend — Professional dApp UI
 
-The test suite demonstrates:
+A modern Next.js interface powers the interaction layer.
 
-* ✅ Vault initialization
-* ✅ SOL deposit
-* ✅ Withdrawal blocked before unlock time
-* ✅ Successful withdrawal after unlock time
-* ✅ Vault closure
+### Features
 
-Run tests locally:
+* Wallet Connect (Phantom)
+* Glassmorphism animated UI
+* Live vault balance display
+* Unlock countdown timer
+* Toast notifications for transactions
+* Framer Motion animations
+
+Run locally:
 
 ```bash
-yarn install
+cd app
+npm install
+npm run dev
+```
+
+Open:
+
+```
+http://localhost:3000
+```
+
+---
+
+# 🧪 Testing
+
+Complete Anchor test suite validates:
+
+* Initialization logic
+* Deposit transfers
+* Locked withdrawal rejection
+* Successful withdrawal post unlock
+* Vault closure
+
+Run tests:
+
+```bash
 anchor test
 ```
 
 ---
 
-## 🚀 Deployment
+# 🚀 Devnet Deployment
 
-Network: **Devnet**
-
-Program ID:
+**Program ID**
 
 ```
 8SKpWVeyrbDTJpGztuEVK399jHSx5n2HuAGSAjgHKGQo
 ```
 
-To deploy:
+Explorer:
 
-```bash
-solana config set --url devnet
-anchor build
-anchor deploy
+https://explorer.solana.com/address/8SKpWVeyrbDTJpGztuEVK399jHSx5n2HuAGSAjgHKGQo?cluster=devnet
+
+---
+
+# 🛠 Tech Stack
+
+* 🦀 Anchor (Rust)
+* ⚡ Solana Web3.js
+* 🧩 PDA Account Model
+* 🌐 Next.js App Router
+* 🎨 TailwindCSS
+* ✨ Framer Motion
+* 🔔 React Hot Toast
+
+---
+
+# 📁 Project Structure
+
+```
+alarm_locked/
+ ├── programs/          → Anchor smart contract
+ ├── tests/             → TypeScript tests
+ ├── app/               → Next.js frontend
+ │    ├── app/page.tsx
+ │    ├── providers.tsx
+ │    └── lib/anchor.ts
+ └── Anchor.toml
 ```
 
 ---
 
-## 🛠 Tech Stack
+# 🧩 Design Philosophy
 
-* Rust
-* Anchor Framework
-* Solana Web3.js
-* TypeScript
-* Mocha / Chai
+Alarm Locked demonstrates a key Web3 principle:
+
+> Replace human trust with deterministic rules.
+
+Instead of asking:
+
+> “Will the user wait?”
+
+The contract guarantees:
+
+> “The user must wait.”
 
 ---
 
-## 📂 Project Structure
+# 🎯 Capstone Requirements Checklist
+
+✔ Anchor Framework
+✔ Unique Constraint (Time Lock)
+✔ PDA Usage
+✔ Automated Tests
+✔ Devnet Deployment
+✔ Documentation
+✔ Frontend Integration
+
+---
+
+# 📸 Screenshots
+
+Add UI screenshots here:
 
 ```
-programs/alarm_locked/src/lib.rs   → Smart contract logic
-tests/alarm_locked.ts              → Test suite
-Anchor.toml                        → Anchor configuration
+/screenshots/vault-ui.png
 ```
 
 ---
 
-## 🔎 Security Notes
+# 🧑‍💻 Author
 
-* PDA signer seeds prevent unauthorized withdrawals.
-* Clock sysvar enforces immutable time-based rules.
-* Custom error handling improves clarity and safety.
-
----
-
-## 📸 Test Results
-
-(Add a screenshot of your passing `anchor test` output here.)
+**Kunal Sah**
+Solana Builder • Smart Contract Developer
 
 ---
 
-## 👤 Author
-
-Alarm Locked – Time Locked Vault
-Built using Anchor for Solana Capstone Submission.
+<p align="center">
+  Built with ⚡ on Solana Devnet
+</p>
