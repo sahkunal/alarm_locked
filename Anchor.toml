@@ -12,7 +12,7 @@ alarm_locked = "8SKpWVeyrbDTJpGztuEVK399jHSx5n2HuAGSAjgHKGQo"
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "localnet"
+cluster = "devnet"
 wallet = "~/.config/solana/id.json"
 
 [scripts]
