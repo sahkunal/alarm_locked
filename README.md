@@ -224,7 +224,8 @@ The contract guarantees:
 Add UI screenshots here:
 
 ```
-/screenshots/vault-ui.png
+Screenshot 2026-02-22 204246.png
+Screenshot 2026-02-22 204257.png
 ```
 
 ---
