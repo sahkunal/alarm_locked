@@ -14,16 +14,18 @@
 </p>
 
 ---
+
 A production-style Solana smart contract built with Anchor that enforces
 time-based withdrawal constraints using Program Derived Addresses (PDAs).
 
 This project demonstrates:
 
-- On-chain custody vault architecture
-- PDA-based authorization
-- Time-locked withdrawal logic
-- Devnet deployment
-- Full React + Next.js Web3 frontend
+* On-chain custody vault architecture
+* PDA-based authorization
+* Time-locked withdrawal logic
+* Modular Anchor program structure
+* Devnet deployment
+* Full React + Next.js Web3 frontend
 
 # ✨ Overview
 
@@ -90,6 +92,47 @@ Allowed only after unlock time passes.
 ### 4️⃣ Close Vault
 
 Closes PDA after funds are withdrawn.
+
+---
+
+# 🧱 Program Architecture (Updated)
+
+The Anchor program was refactored into a modular structure to keep `lib.rs` minimal and production-ready.
+
+### Instruction Modules
+
+```
+instructions/
+ ├── initialize.rs
+ ├── deposit.rs
+ ├── withdraw.rs
+ └── close_vault.rs
+```
+
+Each instruction contains:
+
+* Account validation
+* Constraint logic
+* CPI transfers
+* Event emission
+
+### State Layer
+
+```
+state/
+ └── vault_state.rs
+```
+
+Stores PDA metadata including owner, unlock timestamp, and bumps.
+
+### Shared Modules
+
+```
+errors.rs   → Custom error codes
+events.rs   → On-chain event logging
+```
+
+This structure mirrors production Anchor programs where instruction logic is isolated from the program entrypoint.
 
 ---
 
@@ -190,7 +233,14 @@ https://explorer.solana.com/address/8SKpWVeyrbDTJpGztuEVK399jHSx5n2HuAGSAjgHKGQo
 
 ```
 alarm_locked/
- ├── programs/          → Anchor smart contract
+ ├── programs/
+ │    └── alarm_locked/
+ │         └── src/
+ │              ├── lib.rs
+ │              ├── instructions/
+ │              ├── state/
+ │              ├── errors.rs
+ │              └── events.rs
  ├── tests/             → TypeScript tests
  ├── app/               → Next.js frontend
  │    ├── app/page.tsx
@@ -225,6 +275,7 @@ The contract guarantees:
 ✔ Automated Tests
 ✔ Devnet Deployment
 ✔ Documentation
+✔ Modular Program Architecture
 ✔ Frontend Integration
 
 ---
